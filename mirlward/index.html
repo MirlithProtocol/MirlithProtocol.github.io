@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mirlward — verifiable offline seed tool</title>
+<meta name="description" content="Mirlward — a verifiable, offline tool for Bitcoin seed phrases and keys."><meta name="robots" content="index, nofollow">
+<meta name="color-scheme" content="dark">
+<style>
+  :root{
+    /* Weathered stone + bronze patina — "identity that outlives its issuer" */
+    --stone:        #15191b;
+    --stone-deep:   #0f1314;
+    --limestone:    #e9e6df;
+    --muted:        #97a09d;
+    --faint:        #5b6562;
+    --patina:       #6fb5a4;   /* verdigris / aged bronze */
+    --patina-dim:   #4a8678;
+    --seam:         #232a2c;
+    --serif: "Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+    --sans: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,system-ui,sans-serif;
+    --mono: ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    background:
+      radial-gradient(120% 90% at 50% -10%, #1b2123 0%, var(--stone) 46%, var(--stone-deep) 100%);
+    color:var(--limestone);
+    font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+    display:flex;
+    min-height:100%;
+  }
+
+  .frame{
+    margin:auto;
+    width:100%;
+    max-width:640px;
+    padding:72px 32px 56px;
+    text-align:center;
+    position:relative;
+  }
+
+  /* a single fine seam — self-containment, a sealed whole */
+  .frame::before{
+    content:"";
+    position:absolute;
+    top:0;bottom:0;left:50%;
+    width:1px;
+    background:linear-gradient(180deg,transparent,var(--seam) 14%,var(--seam) 86%,transparent);
+    opacity:.5;
+    z-index:-1;
+  }
+
+  .eyebrow{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.42em;
+    text-transform:uppercase;
+    color:var(--patina);
+    margin:0 0 30px;
+    padding-left:.42em; /* optical centering for tracked caps */
+  }
+
+  .wordmark{
+    font-family:var(--serif);
+    font-weight:400;
+    font-size:clamp(52px,15vw,92px);
+    line-height:.96;
+    letter-spacing:.01em;
+    margin:0;
+    /* engraved into stone */
+    color:var(--limestone);
+    text-shadow:0 1px 0 #000, 0 -1px 0 rgba(255,255,255,.04);
+  }
+
+  .rule{
+    width:54px;height:2px;
+    margin:30px auto 30px;
+    background:var(--patina);
+    box-shadow:0 0 18px -2px var(--patina-dim);
+  }
+
+  .lede{
+    font-family:var(--serif);
+    font-weight:400;
+    font-size:clamp(18px,3.4vw,21px);
+    line-height:1.62;
+    color:var(--limestone);
+    max-width:30em;
+    margin:0 auto;
+  }
+
+  .status{
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:.04em;
+    color:var(--muted);
+    margin:34px auto 0;
+    max-width:34em;
+  }
+
+  .contact{
+    margin:46px 0 0;
+    font-family:var(--mono);
+    font-size:13px;
+    letter-spacing:.03em;
+  }
+  .contact a{
+    color:var(--patina);
+    text-decoration:none;
+    border-bottom:1px solid var(--patina-dim);
+    padding-bottom:2px;
+    transition:color .18s ease,border-color .18s ease;
+  }
+  .contact a:hover{color:#8fd0c0;border-color:#8fd0c0}
+
+  .colophon{
+    margin-top:64px;
+    padding-top:22px;
+    border-top:1px solid var(--seam);
+    font-family:var(--mono);
+    font-size:10.5px;
+    letter-spacing:.08em;
+    color:var(--faint);
+    line-height:1.9;
+  }
+  .colophon a{color:var(--faint);text-decoration:none;border-bottom:1px solid transparent}
+  .colophon a:hover{color:var(--muted);border-bottom-color:var(--faint)}
+
+  /* focus + motion accessibility */
+  a:focus-visible{
+    outline:2px solid var(--patina);
+    outline-offset:3px;
+    border-radius:2px;
+  }
+
+  .frame > *{opacity:0;animation:settle .9s ease forwards}
+  .eyebrow{animation-delay:.05s}
+  .wordmark{animation-delay:.12s}
+  .rule{animation-delay:.20s}
+  .lede{animation-delay:.26s}
+  .status{animation-delay:.34s}
+  .contact{animation-delay:.40s}
+  .colophon{animation-delay:.48s}
+
+  @keyframes settle{
+    from{opacity:0;transform:translateY(10px)}
+    to{opacity:1;transform:none}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .frame > *{animation:none;opacity:1;transform:none}
+  }
+
+  /* Mirlward section */
+  .frame{max-width:720px}
+  .frame > *{opacity:1;animation:none}
+  .back{font-family:var(--mono);font-size:11px;letter-spacing:.12em;margin:0 0 40px}
+  .back a{color:var(--muted);text-decoration:none}
+  .back a:hover{color:var(--patina)}
+  .body{text-align:left;margin:46px auto 0;max-width:36em}
+  .body h2{font-family:var(--mono);font-weight:400;font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:var(--patina);margin:44px 0 14px}
+  .body p,.body li{font-family:var(--serif);font-size:17px;line-height:1.62;color:var(--limestone)}
+  .body p{margin:0 0 14px}
+  .body ul,.body ol{margin:0 0 14px;padding-left:1.3em}
+  .body li{margin:0 0 8px}
+  .body a{color:var(--patina);text-decoration:none;border-bottom:1px solid var(--patina-dim)}
+  .body a:hover{color:#8fd0c0;border-color:#8fd0c0}
+  .body strong{font-weight:600}
+  code,pre{font-family:var(--mono);font-size:12.5px;color:var(--limestone)}
+  pre{background:var(--stone-deep);border:1px solid var(--seam);border-radius:4px;padding:14px 16px;overflow-x:auto;line-height:1.7;margin:0 0 14px}
+  .pin{display:block;word-break:break-all;background:var(--stone-deep);border:1px solid var(--seam);border-radius:4px;padding:12px 14px;margin:0 0 14px;color:var(--patina)}
+  .warn{border-left:2px solid var(--patina);padding:4px 0 4px 16px;margin:0 0 14px}
+</style>
+</head>
+<body>
+  <main class="frame">
+    <p class="back"><a href="/">&larr; mirlith.org</a></p>
+
+    <p class="eyebrow">Related work</p>
+
+    <h1 class="wordmark">Mirlward</h1>
+
+    <div class="rule" aria-hidden="true"></div>
+
+    <p class="lede">
+      A verifiable, offline tool for Bitcoin seed phrases and keys. One HTML file
+      that lets you prove the tool has not been tampered with, and prove your
+      backup restores the right wallet before you rely on it.
+    </p>
+
+    <p class="status">Open source &middot; Apache-2.0 &middot; current release v0.1.0-beta (pre-release)</p>
+
+    <div class="body">
+      <p>Mirlward is a separate project by the same author. It uses strictly standard
+      Bitcoin cryptography (BIP39, BIP32, BIP44, BIP84, BIP173) and adds nothing of its own:
+      the point is that every output can be checked.</p>
+
+      <h2>What it does</h2>
+      <ul>
+        <li><strong>Verify the tool.</strong> A single self-contained file with a published
+        SHA-256 pin, a reproducible build and a conformance corpus of official test vectors.</li>
+        <li><strong>Verify the backup.</strong> Enter a phrase; Mirlward checks the checksum and shows
+        the key fingerprint, account xpubs and first addresses, so you can compare them with a
+        known wallet before trusting the paper.</li>
+        <li><strong>Stay offline.</strong> No network requests, no accounts, no telemetry, nothing stored.
+        Reloading the page wipes memory.</li>
+      </ul>
+
+      <h2>Download</h2>
+      <p>Get <code>mirlward_beta.html</code> and its <code>.sha256</code> file from the
+      <a href="https://github.com/mirlward/mirlward/releases/tag/v0.1.0-beta" rel="noopener">v0.1.0-beta release on GitHub</a>.
+      SHA-256 of <code>mirlward_beta.html</code>:</p>
+      <code class="pin">55cb0b107bf19165a881b041316c8a124245efb2619778474db91d070065ddc2</code>
+
+      <h2>Verify your copy</h2>
+<pre>shasum -a 256 mirlward_beta.html               # macOS
+sha256sum mirlward_beta.html                   # Linux
+certutil -hashfile mirlward_beta.html SHA256   # Windows</pre>
+      <p>If the result differs from the pin above, do not use the file. To check correctness
+      against the official vectors, with no dependencies:</p>
+<pre>node conformance.js</pre>
+
+      <h2>Use it safely</h2>
+      <p class="warn">Your seed phrase is the master key to your money. Anyone who sees it controls
+      the coins; if you lose it, there is no recovery.</p>
+      <ol>
+        <li>Save the file to a USB stick.</li>
+        <li>Open it on an air-gapped machine, ideally booted from a clean live USB.</li>
+        <li>Write the phrase on paper, in order. Never a photo or a cloud note.</li>
+        <li>Close the page and secure the machine.</li>
+      </ol>
+      <p>Before using it with real funds, read the
+      <a href="https://github.com/mirlward/mirlward/blob/main/THREAT_MODEL.md" rel="noopener">threat model</a>.</p>
+
+      <h2>Source and security</h2>
+      <ul>
+        <li>Repository: <a href="https://github.com/mirlward/mirlward" rel="noopener">github.com/mirlward/mirlward</a></li>
+        <li>Security policy: <a href="https://github.com/mirlward/mirlward/blob/main/SECURITY.md" rel="noopener">SECURITY.md</a>.
+        Report vulnerabilities privately, not in public issues.</li>
+      </ul>
+    </div>
+
+    <p class="contact">
+      <a href="mailto:mirlwardofficial@proton.me">mirlwardofficial@proton.me</a>
+    </p>
+
+    <footer class="colophon">
+      Independent research<br>
+      ORCID <a href="https://orcid.org/0009-0007-0632-1365" rel="noopener">0009-0007-0632-1365</a>
+    </footer>
+  </main>
+</body>
+</html>
